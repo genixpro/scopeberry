@@ -1,0 +1,19 @@
+.App {
+  text-align: center;
+}
+
+.App .below-top-bar {
+    display: flex;
+    flex-direction: row;
+
+    .left-side-bar {
+        width: 20vw;
+        height: calc(100vh - 60px);
+        border-right: 1px solid rgb(229, 234, 242);
+    }
+
+    .main-content-area {
+        padding: 20px;
+        width: 80vw;
+    }
+}
