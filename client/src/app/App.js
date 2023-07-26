@@ -1,5 +1,5 @@
 import './App.css';
-import { ProjectOnboarding } from "../ProjectOnboarding/ProjectOnboarding";
+import { GeneralInformation } from "../GeneralInformation/GeneralInformation";
 import { MainMenu } from "../menu/MainMenu";
 import { TopBar } from "../menu/TopBar";
 
@@ -14,7 +14,7 @@ function App() {
             </div>
 
             <div className={"main-content-area"}>
-                <ProjectOnboarding />
+                <GeneralInformation />
             </div>
         </div>
     </div>
