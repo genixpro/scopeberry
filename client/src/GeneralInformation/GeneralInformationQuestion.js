@@ -18,15 +18,6 @@ export class GeneralInformationQuestion extends Component {
     }
 
     render() {
-        
-        
-        
-        
-        
-        
-        
-        
-        
         return <div className={"general-information-question-group"}>
                 <div className={"general-information-question-editor-area"}>
                     <span className={"general-information-question"}>{this.props.question}</span>
@@ -54,6 +45,7 @@ export class GeneralInformationQuestion extends Component {
                         }
                     </ul>
                 </div>
+                <div className={"general-information-question-overlay"} />
             </div>
     }
 }

@@ -1,5 +1,5 @@
 import { Component } from "react";
-import "./TopBar.css";
+import "./TopBar.scss";
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 
 

@@ -1,4 +1,4 @@
-import './App.css';
+import './App.scss';
 import { GeneralInformation } from "../GeneralInformation/GeneralInformation";
 import { MainMenu } from "../menu/MainMenu";
 import { TopBar } from "../menu/TopBar";

@@ -26,14 +26,42 @@ export class GeneralInformation extends Component {
         return text;
     }
 
+    chooseNextQuestionPrompt() {
+        if (this.state.questions.length === 0) {
+            return "Given the following project as context:\n\n\"" + this.writeProjectDescriptionPrompt() + "\"\nProvide a chain of reasoning, then write a single question that you would ask to better understand the above project?\nChain of Reasoning: [insert chain of reasoning here].\n\nQuestion:\n [insert question here]";
+        } else if (this.state.questions.length === 1) {
+            return "Given the following project as context:\n\n\"" + this.writeProjectDescriptionPrompt() + "\"\nProvide a chain of reasoning, then rewrite the following question in the context of this project:\nWho is on the team performing this project?\n\nQuestion:\nQuestion:\n [insert question here]";
+        } else if (this.state.questions.length === 2) {
+            return "Given the following project as context:\n\n\"" + this.writeProjectDescriptionPrompt() + "\"\nProvide a chain of reasoning, then rewrite the following question in the context of this project:\nWhen does the project need to be completed?\n\nQuestion:\nQuestion:\n [insert question here]";
+        } else if (this.state.questions.length === 3) {
+            return "Given the following project as context:\n\n\"" + this.writeProjectDescriptionPrompt() + "\"\nProvide a chain of reasoning, then rewrite the following question in the context of this project:\nHow is the project going to get done?\n\nQuestion:\nQuestion:\n [insert question here]";
+        } else {
+            return "Given the following project as context:\n\n\"" + this.writeProjectDescriptionPrompt() + "\"\nProvide a chain of reasoning, then rewrite the following question in the context of this project:\nWhy is the project being done?\n\nQuestion:\nQuestion:\n [insert question here]";
+        }
+    }
+
     requestNewQuestion() {
-        const prompt = "Write me a single question that you would ask to better understand the following project:\n\n\"" + this.writeProjectDescriptionPrompt() + "\"\n";
+        const prompt = this.chooseNextQuestionPrompt();
         getCompletion(prompt).then((result) => {
+            let text = result.result;
+            const questionPlaceholder = "Question:";
+            if (text.indexOf(questionPlaceholder) !== -1) {
+                text = text.substring(text.lastIndexOf(questionPlaceholder) + questionPlaceholder.length)
+            }
+
+            if (text.startsWith("\"")) {
+                text = text.substring(1);
+            }
+
+            if (text.endsWith("\"")) {
+                text = text.substring(0, text.length - 1);
+            }
+
             this.setState({
                 questions: [
                     ...this.state.questions,
                     {
-                        questionText: result.result
+                        questionText: text
                     }
                 ]
             })

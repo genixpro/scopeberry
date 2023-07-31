@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
 
 with open("requirements.txt", 'rt') as f:
-    requirements = [r.strip() for r in f.readlines()]
+    requirements = [r.strip() for r in f.readlines() if r.strip()]
 
 setup(
     name='planguru',

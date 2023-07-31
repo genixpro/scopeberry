@@ -1,3 +1,5 @@
+@use "../components/colors";
+
 .App {
   text-align: center;
 }
@@ -13,7 +15,6 @@
     }
 
     .main-content-area {
-        padding: 20px;
         width: 80vw;
     }
 }
