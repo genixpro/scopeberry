@@ -1,0 +1,21 @@
+@use "../../components/colors";
+
+
+
+.new-section-item {
+  flex-direction: column;
+
+  .new-section-button {
+    border: 1px solid colors.$component-border;
+    flex-direction: column;
+    width: 8vw;
+    height: 7vw;
+
+
+    .new-section-button-icon {
+      font-size: 50px;
+      min-width: 0;
+    }
+  }
+
+}

@@ -1,0 +1,38 @@
+
+
+
+.document-outline {
+  display: flex;
+  flex-direction: column;
+
+  border: 1px solid lightgray;
+
+  .outline-header {
+    padding: 10px;
+  }
+
+  .outline-body {
+    position: relative;
+    flex-grow: 1;
+  }
+
+  .outline-section-list {
+
+  }
+
+  .drag-slot-overlay {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+
+    .drag-slot {
+      height: 130px; // TODO: make this automatically match the dynamic sizes of the underlying outline items.
+    }
+  }
+}

@@ -1,0 +1,15 @@
+@use "../../components/colors";
+
+
+.document-section {
+    border: 1px solid colors.$component-border;
+    flex-direction: row;
+    width: 8vw;
+    height: 7vw;
+
+
+    .document-section-icon {
+      font-size: 30px;
+      min-width: 0;
+    }
+}
