@@ -3,6 +3,7 @@ import {isDescendant} from '@nosferatu500/react-sortable-tree'
 import './node-content-renderer.scss'
 import { IconButton, Button } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
 //TODO: Need to clean this file up. Get ride of all the rst class-names and replace with our own,
@@ -66,7 +67,8 @@ const defaultProps = {
 
 const CreateNodeRenderer = function ({
                                          onTitleChanged,
-    onNewItemClicked,
+                                         onNewItemClicked,
+                                         onDeleteItemClicked
                                      }) {
     const NodeRenderer = function (props) {
         props = {...defaultProps, ...props}
@@ -103,19 +105,9 @@ const CreateNodeRenderer = function ({
             return <div style={{height: '100%'}} {...otherProps}>
                 <div className={classnames('rst__rowWrapper', rowDirectionClass ?? '')}>
                     <div className={'rst__row'}>
-
-                        {/*<div className={'rst__rowContents rst__rowContentsDragDisabled'}>*/}
-
-                            <Button color="success"  variant="contained" startIcon={<AddIcon />} aria-label="add" onClick={(evt) => onNewItemClicked(node)}>
-                                Add
-                            </Button>
-
-                            {/*<IconButton color="primary" aria-label="add">*/}
-                            {/*    <AddIcon />*/}
-                            {/*</IconButton>*/}
-
-
-                        {/*</div>*/}
+                        <Button color="success"  variant="contained" startIcon={<AddIcon />} aria-label="add" onClick={(evt) => onNewItemClicked(node)}>
+                            Add
+                        </Button>
                     </div>
                 </div>
             </div>;
@@ -241,11 +233,22 @@ const CreateNodeRenderer = function ({
                                 </div>
 
                                 <div className="rst__rowToolbar">
-                                    {buttons?.map((btn, index) => (
-                                        <div key={index} className="rst__toolbarButton">
-                                            {btn}
-                                        </div>
-                                    ))}
+                                    <Button
+                                        className-={"item-toolbar-button"}
+                                        color="error"
+                                        variant="contained"
+                                        aria-label="delete"
+                                        onClick={(evt) => onDeleteItemClicked(node)}
+                                    >
+                                        <DeleteIcon fontSize={"small"} />
+                                    </Button>
+
+
+                                    {/*{buttons?.map((btn, index) => (*/}
+                                    {/*    <div key={index} className="rst__toolbarButton">*/}
+                                    {/*        {btn}*/}
+                                    {/*    </div>*/}
+                                    {/*))}*/}
                                 </div>
                             </div>
                         )}

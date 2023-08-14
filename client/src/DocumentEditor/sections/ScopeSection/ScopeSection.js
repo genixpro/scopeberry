@@ -15,6 +15,7 @@ export class ScopeSection extends Component {
         this.nodeContentRenderer = createNodeContentRenderer({
             onTitleChanged: this.handleItemTextChanged.bind(this),
             onNewItemClicked: this.onNewItemClicked.bind(this),
+            onDeleteItemClicked: this.onDeleteItemClicked.bind(this),
         });
 
         this.newItemIndex = 0;
@@ -157,10 +158,26 @@ export class ScopeSection extends Component {
         this.handleTreeChanged(items);
     }
 
+    onDeleteItemClicked(nodeToDelete) {
+        const items = this.state.items;
+        const parent = this.findParentOfItemByTreeIndex(nodeToDelete.treeIndex);
+
+        if (parent) {
+            const indexWithinParent = parent.children.findIndex((child) => child.treeIndex === nodeToDelete.treeIndex);
+            parent.children.splice(indexWithinParent, 1);
+        }
+        else {
+            const indexWithinTopLevel = items.findIndex((child) => child.treeIndex === nodeToDelete.treeIndex);
+            items.splice(indexWithinTopLevel, 1);
+        }
+
+        this.handleTreeChanged(items);
+    }
+
     handleTreeChanged(newTree) {
         this.assignScopeNumbersToTree(newTree);
         this.assignTreeIndexNumbersToTree(newTree);
-        console.log(newTree);
+
         this.setState({ items: newTree })
     }
 
@@ -181,7 +198,7 @@ export class ScopeSection extends Component {
                             return true;
                         }
 
-                        console.log(info.nextTreeIndex, JSON.stringify(info.nextParent, null, 4))
+                        // console.log(info.nextTreeIndex, JSON.stringify(info.nextParent, null, 4))
 
                         const createNewChildNode = info.nextParent.children.find((child) => child.type === "new");
                         if (!createNewChildNode) {
