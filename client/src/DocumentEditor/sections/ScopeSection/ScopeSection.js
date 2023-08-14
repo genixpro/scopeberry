@@ -22,8 +22,7 @@ export class ScopeSection extends Component {
 
 
         const defaultItems = this.generateDefaultItems();
-        this.assignScopeNumbersToTree(defaultItems);
-        this.assignTreeIndexNumbersToTree(defaultItems);
+        this.updateTreeNodes(defaultItems);
         this.state = { items: defaultItems};
     }
 
@@ -41,13 +40,6 @@ export class ScopeSection extends Component {
                         expanded: true,
                         type: "scope-item",
                         children: [],
-                    },
-                    {
-                        "id": `item-${this.newItemIndex++}`,
-                        "title": "Create new item",
-                        expanded: true,
-                        type: "new",
-                        children: [],
                     }
                 ]
             },
@@ -63,19 +55,18 @@ export class ScopeSection extends Component {
                         expanded: true,
                         type: "scope-item",
                         children: [],
-                    },
-                    {
-                        "id": `item-${this.newItemIndex++}`,
-                        "title": "Create new item",
-                        expanded: true,
-                        type: "new",
-                        children: [],
                     }
                 ]
             }
         ];
 
         return defaultItems;
+    }
+
+    updateTreeNodes(items) {
+        this.ensureTreeContainsNewItemNodes(items);
+        this.assignTreeIndexNumbersToTree(items);
+        this.assignScopeNumbersToTree(items);
     }
 
 
@@ -111,6 +102,27 @@ export class ScopeSection extends Component {
     }
 
 
+    ensureTreeContainsNewItemNodes(items) {
+        if (items[items.length - 1].type !== "new") {
+            items.push({
+                "id": `item-${this.newItemIndex++}`,
+                "title": "Create new item",
+                expanded: true,
+                type: "new",
+                children: [],
+            })
+        }
+
+        for (let item of items) {
+            if (item.type !== "new") {
+                if (item.children && item.children.length > 0) {
+                    this.ensureTreeContainsNewItemNodes(item.children);
+                }
+            }
+        }
+    }
+
+
     handleItemTextChanged(newValue, item) {
         item.title = newValue;
         this.setState({ items: this.state.items })
@@ -133,7 +145,6 @@ export class ScopeSection extends Component {
             }
         }
     }
-
 
 
     onNewItemClicked(newItemNode) {
@@ -175,9 +186,7 @@ export class ScopeSection extends Component {
     }
 
     handleTreeChanged(newTree) {
-        this.assignScopeNumbersToTree(newTree);
-        this.assignTreeIndexNumbersToTree(newTree);
-
+        this.updateTreeNodes(newTree);
         this.setState({ items: newTree })
     }
 
