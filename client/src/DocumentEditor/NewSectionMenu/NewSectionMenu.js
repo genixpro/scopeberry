@@ -15,9 +15,9 @@ export class NewSectionMenu  extends Component {
             "type": "background",
         },
         {
-            "name": "Task List",
+            "name": "Scope List",
             "icon": ChecklistIcon,
-            "type": "task-list",
+            "type": "scope-list",
         },
         {
             "name": "Risks",

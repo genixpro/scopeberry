@@ -1,0 +1,32 @@
+
+
+.scope-section {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+
+
+  .scope-item {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+    align-items: flex-start;
+    margin: 0;
+    width: 400px;
+  }
+
+  .rct-tree-item-arrow {
+    margin-right: 0;
+  }
+
+  .scope-item-details {
+    display: flex;
+    flex-direction: row;
+    min-height: 40px;
+  }
+
+  .scope-item-description-input {
+    flex-grow: 1;
+  }
+
+}

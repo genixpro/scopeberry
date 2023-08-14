@@ -18,7 +18,7 @@ export function createDocumentSectionFromDetails(newSection) {
 export function DocumentOutline(props) {
     const [sections, setSections] = useState([]);
 
-    console.log("render with sections", sections);
+    // console.log("render with sections", sections);
 
     const [{isOver, item, dragOffset}, drop] = useDrop(
         () => ({

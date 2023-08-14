@@ -1,9 +1,11 @@
+@use "../../components/sizes";
 
-
+$top-bar-size: sizes.$top-bar-size + 10px;
 
 .document-outline {
   display: flex;
   flex-direction: column;
+  height: calc(100vh - $top-bar-size); // TODO: make this dynamic (and not hard-coded)
 
   border: 1px solid lightgray;
 
