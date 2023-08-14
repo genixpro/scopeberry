@@ -113,6 +113,10 @@ export class ScopeSection extends Component {
             })
         }
 
+        if (items.length === 1 && items[0].type === "new") {
+            items.splice(0, 1);
+        }
+
         for (let item of items) {
             if (item.type !== "new") {
                 if (item.children && item.children.length > 0) {
