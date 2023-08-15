@@ -2,7 +2,8 @@ import {Component} from "react";
 import "./ScopeSection.scss";
 import {SortableTreeWithoutDndContext as SortableTree} from '@nosferatu500/react-sortable-tree';
 import '@nosferatu500/react-sortable-tree/style.css';
-import createNodeContentRenderer from "./node-content-renderer";
+import createScopeItemRenderer from "./scope-item-renderer";
+import {getCompletion} from "../../../components/api";
 
 
 export class ScopeSection extends Component {
@@ -12,10 +13,11 @@ export class ScopeSection extends Component {
     constructor(...args) {
         super(...args);
 
-        this.nodeContentRenderer = createNodeContentRenderer({
+        this.nodeContentRenderer = createScopeItemRenderer({
             onTitleChanged: this.handleItemTextChanged.bind(this),
             onNewItemClicked: this.onNewItemClicked.bind(this),
             onDeleteItemClicked: this.onDeleteItemClicked.bind(this),
+            onFillSubtasksClicked: this.onFillSubtasksClicked.bind(this),
         });
 
         this.newItemIndex = 0;
@@ -30,33 +32,10 @@ export class ScopeSection extends Component {
         const defaultItems = [
             {
                 "id": `item-${this.newItemIndex++}`,
-                "title": "First Element",
+                "title": "Mobile App",
                 expanded: true,
                 type: "scope-item",
-                children: [
-                    {
-                        "id": `item-${this.newItemIndex++}`,
-                        "title": "another element",
-                        expanded: true,
-                        type: "scope-item",
-                        children: [],
-                    }
-                ]
-            },
-            {
-                "id": `item-${this.newItemIndex++}`,
-                "title": "Third",
-                expanded: true,
-                type: "scope-item",
-                children: [
-                    {
-                        "id": `item-${this.newItemIndex++}`,
-                        "title": "Fourth element",
-                        expanded: true,
-                        type: "scope-item",
-                        children: [],
-                    }
-                ]
+                children: []
             }
         ];
 
@@ -67,6 +46,7 @@ export class ScopeSection extends Component {
         this.ensureTreeContainsNewItemNodes(items);
         this.assignTreeIndexNumbersToTree(items);
         this.assignScopeNumbersToTree(items);
+        this.assignScopeItemPositionAttributes(items);
     }
 
 
@@ -123,6 +103,26 @@ export class ScopeSection extends Component {
                     this.ensureTreeContainsNewItemNodes(item.children);
                 }
             }
+        }
+    }
+
+    assignScopeItemPositionAttributes(items) {
+        for (let index = 0; index < items.length; index++) {
+            if (index === items.length - 1) {
+                items[index].isLastScopeItemInGroup = false;
+            } else if (index === items.length - 2) {
+                items[index].isLastScopeItemInGroup = true;
+            } else {
+                items[index].isLastScopeItemInGroup = false;
+            }
+
+            if (index === 0) {
+                items[index].isFirstScopeItemInGroup = true;
+            } else {
+                items[index].isFirstScopeItemInGroup = false;
+            }
+
+            this.assignScopeItemPositionAttributes(items[index].children)
         }
     }
 
@@ -189,6 +189,33 @@ export class ScopeSection extends Component {
         this.handleTreeChanged(items);
     }
 
+    onFillSubtasksClicked(nodeToFill) {
+        const items = this.state.items;
+
+        const prompt = "Come up with a list of subtasks for " + nodeToFill.title + ".";
+
+        getCompletion(prompt).then((result) => {
+            let text = result.result;
+
+            const subtasks = text.split("\n");
+            for (let subtask of subtasks) {
+                const subtaskWithoutNumber = subtask.replace(/^\d+\.\s*/, "");
+
+                const newItem = {
+                    "id": `item-${this.newItemIndex++}`,
+                    "title": subtaskWithoutNumber,
+                    expanded: true,
+                    type: "scope-item",
+                    children: [],
+                }
+
+                nodeToFill.children.splice(nodeToFill.children.length - 1, 0, newItem);
+            }
+
+            this.handleTreeChanged(items);
+        });
+    }
+
     handleTreeChanged(newTree) {
         this.updateTreeNodes(newTree);
         this.setState({ items: newTree })
@@ -205,6 +232,7 @@ export class ScopeSection extends Component {
                 getNodeKey={({ node }) => node.id}
                 nodeContentRenderer={this.nodeContentRenderer}
                 canNodeHaveChildren={(node) => node.type === "scope-item"}
+                rowHeight={30}
                 canDrop={(info) => {
                     if (info.nextParent) {
                         if (info.nextParent.children.length === 1) {
@@ -224,7 +252,13 @@ export class ScopeSection extends Component {
                             }
                         }
                     } else {
-                        return true;
+                        const lastItem = this.state.items[this.state.items.length - 1];
+
+                        if (info.nextTreeIndex < lastItem.treeIndex) {
+                            return true;
+                        } else {
+                            return false;
+                        }
                     }
                 }}
                 isVirtualized={true}
