@@ -1,3 +1,6 @@
+$scope-item-hover-color: #fafafa;
+$scope-item-border-color: #bbb;
+
 .scope-editor-tree-item {
   .scope-number {
     min-width: 40px;
@@ -12,10 +15,26 @@
     height: 100%;
     padding-left: 10px;
     width: 50vw;
+    background: transparent;
     &:focus {
       outline: none;
       border: 1px solid red;
     }
+  }
+
+  .scope-item-title-viewer {
+    border-left: 1px solid $scope-item-border-color;
+    height: 100%;
+    padding-left: 10px;
+    width: 50vw;
+    background: transparent;
+    font-size: 16px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
   }
 
   .scope-item-row {
@@ -112,11 +131,11 @@
     .scope-item-toolbar-button {
       margin: 0;
       border-radius: 0;
-      border-top: solid #bbb 1px;
+      border-top: solid $scope-item-border-color 1px;
       &:last-child {
-        border-right: solid #bbb 1px;
+        border-right: solid $scope-item-border-color 1px;
       }
-      border-bottom: solid #bbb 1px;
+      border-bottom: solid $scope-item-border-color 1px;
       box-shadow: none;
     }
   }
@@ -124,8 +143,8 @@
   .scope-item-rowContents {
     position: relative;
     height: 100%;
-    border-top: solid #bbb 1px;
-    border-right: solid #bbb 1px;
+    border-top: solid $scope-item-border-color 1px;
+    border-right: solid $scope-item-border-color 1px;
     border-left: none;
     padding: 0 5px 0 10px;
     border-radius: 0;
@@ -139,7 +158,7 @@
 
   &.scope-item-last-in-group, &.scope-item-has-children {
     .scope-item-rowContents {
-      border-bottom: 1px solid #bbb;
+      border-bottom: 1px solid $scope-item-border-color;
     }
   }
 
@@ -149,19 +168,67 @@
     }
   }
 
+  &:hover {
+    .scope-item-rowContents {
+      background-color: $scope-item-hover-color;
+    }
+  }
+
+  &.predicted-scope-item {
+    animation: fadeIn 0.5s;
+
+    .scope-item-rowContents {
+      border-left: solid $scope-item-border-color 1px;
+      opacity: 50%;
+    }
+  }
+
+  .predicted-scope-acceptance-toolbar {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+  }
+
+  .predicted-scope-item-acceptance-button {
+    &:first-child {
+      border-top-left-radius: 3px !important;
+      border-top-right-radius: 0 !important;
+      border-bottom-left-radius: 3px !important;
+      border-bottom-right-radius: 0 !important;
+    }
+    &:last-child {
+      border-top-left-radius: 0 !important;
+      border-top-right-radius: 0px !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0px !important;
+    }
+    padding-left: 6px;
+    padding-right: 6px;
+    min-width: 0px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+
+  .scope-item-predictions-loading-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 100%;
+  }
+
   .scope-item-rtl.scope-item-rowContents {
     border-right: none;
-    border-left: solid #bbb 1px;
+    border-left: solid $scope-item-border-color 1px;
     padding: 0 10px 0 5px;
   }
 
   .scope-item-rowContentsDragDisabled {
-    border-left: solid #bbb 1px;
+    border-left: solid $scope-item-border-color 1px;
   }
 
   .scope-item-rtl.scope-item-rowContentsDragDisabled {
-    border-right: solid #bbb 1px;
-    border-left: solid #bbb 1px;
+    border-right: solid $scope-item-border-color 1px;
+    border-left: solid $scope-item-border-color 1px;
   }
 
   .scope-item-rowLabel {
@@ -183,7 +250,7 @@
   .scope-item-loadingHandle {
     height: 100%;
     width: 45px;
-    background: #ffffff url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MiIgaGVpZ2h0PSI0MiI+PGcgc3Ryb2tlPSIjQkJCIiBzdHJva2Utd2lkdGg9IjIuOSIgPjxwYXRoIGQ9Ik0xNCAxNS43aDE0LjQiLz48cGF0aCBkPSJNMTQgMjEuNGgxNC40Ii8+PHBhdGggZD0iTTE0IDI3LjFoMTQuNCIvPjwvZz48L3N2Zz4K') no-repeat center;
+    background: #fff url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MiIgaGVpZ2h0PSI0MiI+PGcgc3Ryb2tlPSIjQkJCIiBzdHJva2Utd2lkdGg9IjIuOSIgPjxwYXRoIGQ9Ik0xNCAxNS43aDE0LjQiLz48cGF0aCBkPSJNMTQgMjEuNGgxNC40Ii8+PHBhdGggZD0iTTE0IDI3LjFoMTQuNCIvPjwvZz48L3N2Zz4K') no-repeat center;
     border-top: solid #aaa 1px;
     border-left: solid #aaa 1px;
     border-right: solid #aaa 1px;
@@ -192,10 +259,17 @@
     z-index: 1;
   }
 
+  &:hover {
+    .scope-item-moveHandle,
+    .scope-item-loadingHandle {
+      background-color: $scope-item-hover-color;
+    }
+  }
+
   &.scope-item-last-in-group, &.scope-item-has-children {
     .scope-item-moveHandle,
     .scope-item-loadingHandle {
-      border-bottom: 1px solid #bbb;
+      border-bottom: 1px solid $scope-item-border-color;
     }
   }
 
@@ -412,4 +486,9 @@
     right: 50%;
     left: initial;
   }
+}
+
+@keyframes predictedScopeItemFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 0.5; }
 }

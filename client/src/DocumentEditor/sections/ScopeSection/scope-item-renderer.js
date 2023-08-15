@@ -1,3 +1,12 @@
+/**
+ * This file contains a rendering module that renders a single item op scope within the scope editor.
+ * It is plugged into the react-sortable-tree module.
+ *
+ * TODO: Need to clean this file up. Get ride of all the unused code and class names, and generally
+ * TODO: make it more readable. Its a bit messy because it was modified from the default built in
+ * TODO: renderer provided by react-sortable-tree.
+ */
+
 import React from 'react'
 import {isDescendant} from '@nosferatu500/react-sortable-tree'
 import './scope-item-renderer.scss'
@@ -5,10 +14,10 @@ import {IconButton, Button} from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandIcon from '@mui/icons-material/Expand';
-import DragHandleIcon from '@mui/icons-material/DragHandle';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import CircularProgress from '@mui/material/CircularProgress';
 
-//TODO: Need to clean this file up. Get ride of all the rst class-names and replace with our own,
-// get rid of code that is not relevant to our use-case
 
 function classnames(...args) {
     return args.join(" ");
@@ -68,8 +77,6 @@ const defaultProps = {
 
 /**
  * This renders the rows in the scope editor that are used for adding new items.
- * @param props
- * @returns {Element}
  */
 function renderNewScopeItemRow(props, eventHandlers) {
     const {
@@ -155,7 +162,12 @@ function renderScopeItemToolbar(node, eventHandlers) {
     </div>;
 }
 
-function renderRowContentsEditor(rowDirectionClass, node, nodeTitle, onTitleChanged) {
+function renderRowContentsEditor(rowDirectionClass, node, eventHandlers) {
+    const {
+        onTitleChanged,
+        onTitleEditBlur,
+    } = eventHandlers;
+
     return <div
         className={classnames(
             'scope-item-rowContents',
@@ -168,10 +180,34 @@ function renderRowContentsEditor(rowDirectionClass, node, nodeTitle, onTitleChan
 
         <input
             className={"scope-item-title-edit"}
-            value={nodeTitle}
+            value={node.title}
             onChange={(e) => onTitleChanged(e.target.value, node)}
+            onBlur={(e) => onTitleEditBlur(node)}
         />
     </div>;
+}
+
+function renderStaticRowContentsViewer(rowDirectionClass, node) {
+    return <div
+        className={classnames(
+            'scope-item-rowContents',
+            rowDirectionClass ?? '',
+        )}>
+
+        <span className={"scope-number"}>
+            {node.scopeNumber}
+        </span>
+
+        <div className={"scope-item-title-viewer"}> <span>{node.title} </span></div>
+    </div>;
+}
+
+function computeTreeNodeClassNames(node) {
+    return "scope-editor-tree-item " +
+        (node.children.length > 0 ? 'scope-item-has-children ' : ' ') +
+        (node.isLastScopeItemInGroup ? 'scope-item-last-in-group ' : ' ') +
+        (node.isFirstScopeItemInGroup && node.treeIndex > 0 ? 'scope-item-first-in-group ' : ' ') +
+        (node.type === "predicted-scope-item" ? 'predicted-scope-item ' : ' ');
 }
 
 /**
@@ -212,7 +248,6 @@ function renderScopeItemRow(props, eventHandlers) {
         ...otherProps
     } = props
     const rowDirectionClass = rowDirection === 'rtl' ? 'scope-item-rtl' : undefined
-    const nodeTitle = title || node.title;
 
     let handle
     if (canDrag) {
@@ -246,12 +281,7 @@ function renderScopeItemRow(props, eventHandlers) {
     if (rowDirection === 'rtl') {
         buttonStyle = {right: -0.5 * scaffoldBlockPxWidth, left: 0}
     }
-
-    let scopeTreeItemClasses =
-        "scope-editor-tree-item " +
-        (node.children.length > 0 ? 'scope-item-has-children ' : ' ') +
-        (node.isLastScopeItemInGroup ? 'scope-item-last-in-group ' : ' ') +
-        (node.isFirstScopeItemInGroup && node.treeIndex > 0 ? 'scope-item-first-in-group ' : ' ');
+    let scopeTreeItemClasses = computeTreeNodeClassNames(node);
 
     return (
         <div style={{height: '100%'}} {...otherProps} className={scopeTreeItemClasses}>
@@ -307,7 +337,7 @@ function renderScopeItemRow(props, eventHandlers) {
                         }}>
                         {handle}
 
-                        {renderRowContentsEditor(rowDirectionClass, node, nodeTitle, onTitleChanged)}
+                        {renderRowContentsEditor(rowDirectionClass, node, eventHandlers)}
 
                         {renderScopeItemToolbar(node, eventHandlers)}
                     </div>
@@ -316,6 +346,114 @@ function renderScopeItemRow(props, eventHandlers) {
         </div>
     )
 }
+
+function renderPredictedScopeItemRow(props, eventHandlers) {
+    const {
+        onAcceptPredictedScopeItemClicked,
+        onRejectPredictedScopeItemClicked
+    } = eventHandlers;
+
+    const {
+        scaffoldBlockPxWidth,
+        toggleChildrenVisibility,
+        connectDragPreview,
+        connectDragSource,
+        isDragging,
+        canDrop,
+        canDrag,
+        node,
+        title,
+        subtitle,
+        draggedNode,
+        path,
+        treeIndex,
+        isSearchMatch,
+        isSearchFocus,
+        buttons,
+        className,
+        style,
+        didDrop,
+        treeId: _treeId,
+        isOver: _isOver, // Not needed, but preserved for other renderers
+        parentNode: _parentNode, // Needed for dndManager
+        rowDirection,
+        ...otherProps
+    } = props;
+
+    const rowDirectionClass = rowDirection === 'rtl' ? 'scope-item-rtl' : undefined
+    let scopeTreeItemClasses = computeTreeNodeClassNames(node);
+
+    return <div style={{height: '100%'}} {...otherProps} className={scopeTreeItemClasses}>
+        <div className={classnames('scope-item-rowWrapper', rowDirectionClass ?? '')}>
+            <div className={'scope-item-row'}>
+                <div className={"predicted-scope-acceptance-toolbar"}>
+                    <Button
+                        className={"predicted-scope-item-acceptance-button"}
+                        color="success"
+                        variant="contained"
+                        aria-label="Accept"
+                        onClick={(evt) => onAcceptPredictedScopeItemClicked(node)}
+                    >
+                        <CheckIcon sx={{fontSize: "24px"}}/>
+                    </Button>
+                    <Button
+                        className={"predicted-scope-item-acceptance-button"}
+                        color="error"
+                        variant="contained"
+                        aria-label="Reject"
+                        onClick={(evt) => onRejectPredictedScopeItemClicked(node)}
+                    >
+                        <CloseIcon sx={{fontSize: "24px"}}/>
+                    </Button>
+                </div>
+
+                {renderStaticRowContentsViewer(rowDirectionClass, node, eventHandlers)}
+            </div>
+        </div>
+    </div>;
+}
+function renderLoadingPredictionsRow(props, eventHandlers) {
+    const {
+        scaffoldBlockPxWidth,
+        toggleChildrenVisibility,
+        connectDragPreview,
+        connectDragSource,
+        isDragging,
+        canDrop,
+        canDrag,
+        node,
+        title,
+        subtitle,
+        draggedNode,
+        path,
+        treeIndex,
+        isSearchMatch,
+        isSearchFocus,
+        buttons,
+        className,
+        style,
+        didDrop,
+        treeId: _treeId,
+        isOver: _isOver, // Not needed, but preserved for other renderers
+        parentNode: _parentNode, // Needed for dndManager
+        rowDirection,
+        ...otherProps
+    } = props;
+
+    const rowDirectionClass = rowDirection === 'rtl' ? 'scope-item-rtl' : undefined
+    let scopeTreeItemClasses = computeTreeNodeClassNames(node);
+
+    return <div style={{height: '100%'}} {...otherProps} className={scopeTreeItemClasses}>
+        <div className={classnames('scope-item-rowWrapper', rowDirectionClass ?? '')}>
+            <div className={'scope-item-row'}>
+                <div className={'scope-item-predictions-loading-row'}>
+                    <CircularProgress size={20} />
+                </div>
+            </div>
+        </div>
+    </div>;
+}
+
 
 /**
  * This is the function that creates the renderer for the scope items. The renderer is then plugged
@@ -330,6 +468,10 @@ const CreateNodeRenderer = function (eventHandlers) {
             return renderNewScopeItemRow(props, eventHandlers);
         } else if (node.type === "scope-item") {
             return renderScopeItemRow(props, eventHandlers);
+        } else if (node.type === "predicted-scope-item") {
+            return renderPredictedScopeItemRow(props, eventHandlers);
+        }  else if (node.type === "loading-predictions") {
+            return renderLoadingPredictionsRow(props, eventHandlers);
         } else {
             throw new Error("Unknown node type: " + node.type);
         }
