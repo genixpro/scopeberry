@@ -7,6 +7,8 @@ import {getCompletion} from "../../../components/api";
 
 
 export class ScopeSection extends Component {
+    static minTimeToLoadPredictions = 1000;
+
     state = {}
 
     constructor(...args) {
@@ -228,9 +230,13 @@ export class ScopeSection extends Component {
     onFillSubtasksClicked(nodeToFill) {
         const items = this.state.items;
 
-        const prompt = "Come up with a list of subtasks for " + nodeToFill.title + ".";
+        const prompt = "Come up with a list of subtasks for " + nodeToFill.title + "."
 
-        getCompletion(prompt).then((result) => {
+        this.addPredictionsLoadingRowForNode(nodeToFill);
+
+        this.ensureMinimumPromiseResolveTime(getCompletion(prompt), ScopeSection.minTimeToLoadPredictions).then((result) => {
+            this.removeAllPredictionLoadingRows(nodeToFill.children);
+
             const subtasks = this.extractTasksFromGPTResult(result);
             for (let subtask of subtasks) {
                 const newItem = this.createTreeNodeForScopeItem(subtask);
@@ -280,6 +286,17 @@ export class ScopeSection extends Component {
         }
     }
 
+    removeAllPredictionLoadingRows(items) {
+        for (let index = 0; index < items.length; index++) {
+            if (items[index].type === "loading-predictions") {
+                items.splice(index, 1);
+                index -= 1;
+            } else {
+                this.removeAllPredictionLoadingRows(items[index].children);
+            }
+        }
+    }
+
     predictMissingTasks(nodeToPredict) {
         if (!nodeToPredict) {
             // Do nothing.
@@ -294,11 +311,7 @@ export class ScopeSection extends Component {
         this.isLoadingPredictions = true;
 
         const children = nodeToPredict.children;
-
-        const nodeForLoadingPredictionsRow = this.createTreeNodeForLoadingPredictionsRow();
-        nodeToPredict.children.splice(nodeToPredict.children.length - 1, 0, nodeForLoadingPredictionsRow);
-        this.removeAllPredictedScopeItems(this.state.items);
-        this.handleTreeChanged(this.state.items);
+        this.addPredictionsLoadingRowForNode(nodeToPredict);
 
         let prompt = `Given the following subtasks for the task """${nodeToPredict.title}""":\n`;
         for (let childIndex = 0; childIndex < children.length; childIndex++) {
@@ -311,22 +324,8 @@ export class ScopeSection extends Component {
         prompt += "\n";
         prompt += "Predict the missing subtasks for the original task.\n";
 
-        let startTime = new Date();
-        const minTimeToLoadPredictions = 1000;
-
-        getCompletion(prompt).then((result) => {
-            const endTime = new Date();
-            const timeTaken = endTime.getTime() - startTime.getTime();
-            const timeToDelay = Math.max(0, minTimeToLoadPredictions - timeTaken)
-
-            setTimeout(() => {
-                // First delete any loading icons under the node
-                for (let child of nodeToPredict.children) {
-                    if (child.type === "loading-predictions") {
-                        this.removeNodeItemFromTree(child);
-                        break;
-                    }
-                }
+        this.ensureMinimumPromiseResolveTime(getCompletion(prompt), ScopeSection.minTimeToLoadPredictions).then((result) => {
+                this.removeAllPredictionLoadingRows(nodeToPredict.children);
 
                 const subtasks = this.extractTasksFromGPTResult(result);
                 for (let subtask of subtasks) {
@@ -344,8 +343,30 @@ export class ScopeSection extends Component {
                 this.handleTreeChanged(items);
 
                 this.isLoadingPredictions = false;
-            }, timeToDelay)
         });
+    }
+
+    //TODO: Move this into its own utilities file
+    ensureMinimumPromiseResolveTime(promise, minimumTime) {
+        let startTime = new Date();
+        return promise.then((result) => {
+            const endTime = new Date();
+            const timeTaken = endTime.getTime() - startTime.getTime();
+            const timeToDelay = Math.max(0, minimumTime - timeTaken)
+
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    resolve(result);
+                }, timeToDelay)
+            });
+        });
+    }
+
+    addPredictionsLoadingRowForNode(nodeToPredict) {
+        const nodeForLoadingPredictionsRow = this.createTreeNodeForLoadingPredictionsRow();
+        nodeToPredict.children.splice(nodeToPredict.children.length - 1, 0, nodeForLoadingPredictionsRow);
+        this.removeAllPredictedScopeItems(this.state.items);
+        this.handleTreeChanged(this.state.items);
     }
 
     onTitleEditBlur(node) {

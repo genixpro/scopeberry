@@ -181,6 +181,13 @@ function renderRowContentsEditor(rowDirectionClass, node, eventHandlers) {
         <input
             className={"scope-item-title-edit"}
             value={node.title}
+            onKeyUp={(e) => {
+                // console.log(e.key);
+              // Check for the return key and blur the input if its pressed
+                if (e.key === 'Enter' || e.key === 'Return') {
+                    e.target.blur();
+                }
+            }}
             onChange={(e) => onTitleChanged(e.target.value, node)}
             onBlur={(e) => onTitleEditBlur(node)}
         />
