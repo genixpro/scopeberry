@@ -4,7 +4,13 @@ export function computeAPIUrlPrefix() {
     if (window.location.href.includes("localhost") || window.location.href.includes("127.0.0.1")) {
         return "http://localhost:5000";
     } else {
-        return window.location.href + "/api";
+        let url = window.location.href;
+        if (!url.endsWith("/")) {
+            url = url + "/";
+        }
+        url += "api";
+
+        return url;
     }
 }
 

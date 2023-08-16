@@ -36,7 +36,7 @@ spec:
             exec:
               command:
                 - curl
-                - http://localhost:3000/api/home
+                - http://localhost:3000/home
             initialDelaySeconds: 5
             periodSeconds: 3
             successThreshold: 1
@@ -46,7 +46,7 @@ spec:
             exec:
               command:
                 - curl
-                - http://localhost:3000/api/home
+                - http://localhost:3000/home
             initialDelaySeconds: 30
             periodSeconds: 5
             successThreshold: 1
