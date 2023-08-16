@@ -76,8 +76,24 @@ export class ScopeSection extends Component {
     }
 
     generateDefaultItems() {
+        const mobileAppTask = this.createTreeNodeForScopeItem("Mobile App")
+        mobileAppTask.children = [
+            this.createTreeNodeForScopeItem("Login Screen"),
+            this.createTreeNodeForScopeItem("Account Settings Screen"),
+            this.createTreeNodeForScopeItem("Main Social Feed"),
+            this.createTreeNodeForScopeItem("New Post Page"),
+        ];
+
+        const websiteTask = this.createTreeNodeForScopeItem("Website")
+        websiteTask.children = [
+            this.createTreeNodeForScopeItem("Landing Page Copywriting"),
+            this.createTreeNodeForScopeItem("A/B Test Tool Integration"),
+        ]
+
+
         return [
-            this.createTreeNodeForScopeItem("Mobile App")
+            mobileAppTask,
+            websiteTask,
         ];
     }
 

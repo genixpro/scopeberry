@@ -1,5 +1,4 @@
 import "./DocumentEditor.scss";
-import "react-complex-tree/lib/style-modern.css";
 import {Component} from "react";
 import {DocumentOutline} from "./DocumentOutline/DocumentOutline";
 import {NewSectionMenu} from "./NewSectionMenu/NewSectionMenu";
@@ -15,8 +14,9 @@ export class DocumentEditor extends Component {
 
     render() {
         return <div className={"document-editor-page"}>
-            <NewSectionMenu/>
-            <DocumentOutline/>
+            {/*<NewSectionMenu/>*/}
+            {/*<DocumentOutline/>*/}
+            <div style={{height:"100vh"}}></div>
             <ScopeSection/>
 
         </div>;
