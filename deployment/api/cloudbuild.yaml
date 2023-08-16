@@ -1,0 +1,35 @@
+steps:
+  - name: 'gcr.io/kaniko-project/executor:latest'
+    id: Build API Server Docker Image
+    args:
+      - "--destination=gcr.io/planguru/planguru-api-$_PLANGURU_ENV:$REVISION_ID"
+      - "--destination=gcr.io/planguru/planguru-api-$_PLANGURU_ENV:latest"
+      - "--cache=true"
+      - "--cache-ttl=720h"
+      - "--snapshotMode=time"
+      - "--build-arg"
+      - "PLANGURU_ENV=$_PLANGURU_ENV"
+      - "--build-arg"
+      - "REVISION_ID=$REVISION_ID"
+      - "-f"
+      - "deployment/api/Dockerfile"
+    timeout: 1200s
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - 'cluster-info'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-east5'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=planguru-main'
+    timeout: 30s
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: Update Deployment on Kubernetes
+    entrypoint: /bin/bash
+    args:
+      - "./deployment/api/update_api_server.sh"
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-east5'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=planguru-main'
+      - 'PLANGURU_ENV=$_PLANGURU_ENV'
+      - 'REVISION_ID=$REVISION_ID'
+    timeout: 600s
+timeout: 15000s
