@@ -3,7 +3,7 @@ from planguru.app import app
 from planguru.openai_local import completion
 
 @app.route('/home', methods=['GET'])
-def completion_endpoint():
+def home_endpoint():
     return jsonify({"status": "ok"})
 
 
