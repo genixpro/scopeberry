@@ -3,10 +3,6 @@
 # shellcheck disable=SC1090
 source deployment/environments/$PLANGURU_ENV.sh
 
-
-kubectl apply -f deployment/priorities/default.yaml
-kubectl apply -f deployment/priorities/$PLANGURU_ENV.yaml
-
 sed "s/__REVISION_ID__/$REVISION_ID/g;s/__PLANGURU_ENV__/$PLANGURU_ENV/g;s/__MAX_SURGE__/$MAX_SURGE/g;s/__MAX_UNAVAILABLE__/$MAX_UNAVAILABLE/g" deployment/frontend/frontend_server_deployment.yaml > frontend_server_deployment_$PLANGURU_ENV.yaml
 kubectl apply -f frontend_server_deployment_$PLANGURU_ENV.yaml
 

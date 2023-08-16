@@ -2,8 +2,8 @@ steps:
   - name: 'gcr.io/kaniko-project/executor:latest'
     id: Build Frontend Docker Image
     args:
-      - "--destination=gcr.io/planguru/planguru-frontend-$_PLANGURU_ENV:$REVISION_ID"
-      - "--destination=gcr.io/planguru/planguru-frontend-$_PLANGURU_ENV:latest"
+      - "--destination=gcr.io/planguru/planguru-frontend:$REVISION_ID"
+      - "--destination=gcr.io/planguru/planguru-frontend:latest"
       - "--cache=true"
       - "--cache-ttl=720h"
       - "--snapshotMode=time"

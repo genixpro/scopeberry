@@ -28,7 +28,7 @@ spec:
                 secretKeyRef:
                   name: openai-key
                   key: OPENAI_API_KEY
-          image: gcr.io/planguru-cloud/planguru-api-__PLANGURU_ENV__:__REVISION_ID__
+          image: gcr.io/planguru/planguru-api:__REVISION_ID__
           imagePullPolicy: Always
           name: planguru-cloud-sha256
           readinessProbe:
@@ -52,14 +52,12 @@ spec:
             successThreshold: 1
             timeoutSeconds: 15
           resources:
+            limits:
+              cpu: 1000m
+              memory: 256Mi
             requests:
               cpu: 1000m
               memory: 256Mi
-          securityContext:
-            privileged: true
-            capabilities:
-              add:
-                - SYS_ADMIN
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
