@@ -18,18 +18,20 @@
 
 # Default server configuration
 #
-server {
-	listen 80 default_server;
-	listen [::]:80 default_server;
-	server_name _;
-	return 301 https://$host$request_uri;
-}
+#server {
+#	listen 80 default_server;
+#	listen [::]:80 default_server;
+#	server_name _;
+#	return 301 https://$host$request_uri;
+#}
 
 server {
 	# SSL configuration
 	#
-	listen 443 ssl default_server;
-	listen [::]:443 ssl default_server;
+	#listen 443 ssl default_server;
+	#listen [::]:443 ssl default_server;
+	listen 80 default_server;
+	listen [::]:80 default_server;
 	#
 	# Note: You should disable gzip for SSL traffic.
 	# See: https://bugs.debian.org/773332
@@ -44,8 +46,8 @@ server {
 
 	client_max_body_size 100M;
 
-        ssl_certificate /etc/nginx/ssl/nginx.pem;
-        ssl_certificate_key /etc/nginx/ssl/nginx.key;
+    #ssl_certificate /etc/nginx/ssl/nginx.pem;
+    #ssl_certificate_key /etc/nginx/ssl/nginx.key;
 
 	root /build;
 
