@@ -1,6 +1,5 @@
 import { Component } from "react";
 import "./TopBar.scss";
-import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 
 
 export class TopBar extends Component {
@@ -12,7 +11,7 @@ export class TopBar extends Component {
                 <span className={"logo-text"}>ScopeBerry</span>
 
                 <div className={"logo-image"}>
-                    <TextSnippetIcon sx={{ fontSize: 40 }}/>
+                    <img src={"/logo.png"} alt={"logo"} className={"logo-image"}/>
                 </div>
             </div>
 
