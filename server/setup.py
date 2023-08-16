@@ -8,9 +8,9 @@ with open("requirements.txt", 'rt') as f:
     requirements = [r.strip() for r in f.readlines() if r.strip()]
 
 setup(
-    name='planguru',
+    name='scopeberry',
     version='0.0.1',
-    description='Plan Guru',
+    description='ScopeBerry - AI software for project planning and proposal writing',
     long_description=open("README.md", "rt").read(),
     classifiers=[
         'Programming Language :: Python',
@@ -18,7 +18,7 @@ setup(
     ],
     author='Bradley Arsenault',
     author_email='genixpro@gmail.com',
-    url='planguru.io',
+    url='scopeberry.com',
     keywords='artificial intelligence llm',
     packages=find_packages(),
     include_package_data=True,
@@ -26,7 +26,7 @@ setup(
     extras_require={
     },
     package_data={
-        'planguru': [
+        'scopeberry': [
             'config/prebuilt_configs/*.json'
         ]
     },
@@ -34,7 +34,7 @@ setup(
     install_requires=requirements,
     entry_points={
         'console_scripts': [
-            'planguru_server = planguru.bin.server:main'
+            'scopeberry_server = scopeberry.bin.server:main'
         ]
     }
 )

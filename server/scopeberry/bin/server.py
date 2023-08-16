@@ -1,4 +1,4 @@
-from planguru.app import app
+from scopeberry.app import app
 
 def main():
     app.run(host='0.0.0.0', port=5000)

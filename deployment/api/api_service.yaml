@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: planguru-__PLANGURU_ENV__-api
+  name: scopeberry-__SCOPEBERRY_ENV__-api
   labels:
-    app: planguru-__PLANGURU_ENV__-api
-  name: planguru-__PLANGURU_ENV__-api
+    app: scopeberry-__SCOPEBERRY_ENV__-api
+  name: scopeberry-__SCOPEBERRY_ENV__-api
   namespace: default
 spec:
   ports:
@@ -12,7 +12,7 @@ spec:
       protocol: TCP
       targetPort: 3000
   selector:
-    app: planguru-__PLANGURU_ENV__-api
+    app: scopeberry-__SCOPEBERRY_ENV__-api
   sessionAffinity: None
   type: ClusterIP
 

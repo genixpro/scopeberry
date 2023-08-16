@@ -9,7 +9,7 @@ export class TopBar extends Component {
         return <div className={"top-bar"}>
 
             <div className={"logo-area"}>
-                <span className={"logo-text"}>Plan Guru</span>
+                <span className={"logo-text"}>ScopeBerry</span>
 
                 <div className={"logo-image"}>
                     <TextSnippetIcon sx={{ fontSize: 40 }}/>

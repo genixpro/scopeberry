@@ -1,7 +1,7 @@
 # This builds an all-in-one easy to install dockerfile
 
 FROM ubuntu:22.04
-MAINTAINER PlanGuru <genixpro@gmail.com>
+MAINTAINER ScopeBerry <genixpro@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -28,16 +28,16 @@ RUN apt-get update && apt-get install \
      -y && \
     rm -rf /var/lib/apt/lists/*
 
-# Create the planguru user
-RUN useradd -s /bin/bash --home-dir /home/planguru planguru && \
-    mkdir /home/planguru && \
-    chown -R planguru:planguru /home/planguru
+# Create the scopeberry user
+RUN useradd -s /bin/bash --home-dir /home/scopeberry scopeberry && \
+    mkdir /home/scopeberry && \
+    chown -R scopeberry:scopeberry /home/scopeberry
 
 # Set the working directory to /app
-WORKDIR /planguru
+WORKDIR /scopeberry
 COPY server/requirements.txt .
 
-# Install some dependencies which can take a long time to install. We do this ahead of running "ADD . /planguru" so the builds run faster when your
+# Install some dependencies which can take a long time to install. We do this ahead of running "ADD . /scopeberry" so the builds run faster when your
 # making code changes regularly
 RUN pip3 install --upgrade pip==20.2.4 && \
     pip3 install --upgrade setuptools && \
@@ -59,41 +59,41 @@ RUN apt purge -y \
     rm -rf /var/lib/dpkg/*
 
 # Set the working directory to /app
-WORKDIR /planguru
+WORKDIR /scopeberry
 
-# Copy the current directory contents into the container at /planguru
-ADD server /planguru/server
+# Copy the current directory contents into the container at /scopeberry
+ADD server /scopeberry/server
 
 # Install dependencies for server
-WORKDIR /planguru/server
+WORKDIR /scopeberry/server
 RUN python3 setup.py install && \
     rm -rf /root/.cache && \
     chmod +r+r+r -R /usr/lib/python3/
 
-ARG PLANGURU_ENV
+ARG SCOPEBERRY_ENV
 ARG REVISION_ID
-ENV PLANGURU_ENV=${PLANGURU_ENV}
+ENV SCOPEBERRY_ENV=${SCOPEBERRY_ENV}
 ENV REVISION_ID=${REVISION_ID}
 
 
-ENV HOME=/home/planguru
-RUN chown -R planguru:planguru /planguru && \
-    chown -R planguru:planguru /home/planguru && \
+ENV HOME=/home/scopeberry
+RUN chown -R scopeberry:scopeberry /scopeberry && \
+    chown -R scopeberry:scopeberry /home/scopeberry && \
     chmod ugo+r -R /usr/lib/python3
 
 RUN rm -rf /usr/include/*
 
-WORKDIR /home/planguru
-RUN chmod ugo+r -R /usr/lib/python3 && chown -R planguru:planguru /home/planguru
-WORKDIR /planguru/server
+WORKDIR /home/scopeberry
+RUN chmod ugo+r -R /usr/lib/python3 && chown -R scopeberry:scopeberry /home/scopeberry
+WORKDIR /scopeberry/server
 
 # Output all the disk usage for various folders on the system.
 # This helps us to further optimize the container
 # RUN du -h -d 5 -t 10M /; exit 0
 
-USER planguru:planguru
+USER scopeberry:scopeberry
 
 # Setup and configure systemd
-ENTRYPOINT ["bash", "-c", "gunicorn -t 600 -w 1 -b 0.0.0.0:3000 planguru.app:app"]
+ENTRYPOINT ["bash", "-c", "gunicorn -t 600 -w 1 -b 0.0.0.0:3000 scopeberry.app:app"]
 
 EXPOSE 3000

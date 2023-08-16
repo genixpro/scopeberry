@@ -2,13 +2,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: planguru-__PLANGURU_ENV__-frontend
-  name: planguru-__PLANGURU_ENV__-frontend
+    app: scopeberry-__SCOPEBERRY_ENV__-frontend
+  name: scopeberry-__SCOPEBERRY_ENV__-frontend
   namespace: default
 spec:
   selector:
     matchLabels:
-      app: planguru-__PLANGURU_ENV__-frontend
+      app: scopeberry-__SCOPEBERRY_ENV__-frontend
   strategy:
     rollingUpdate:
       maxSurge: __MAX_SURGE__
@@ -17,12 +17,12 @@ spec:
   template:
     metadata:
       labels:
-        app: planguru-__PLANGURU_ENV__-frontend
+        app: scopeberry-__SCOPEBERRY_ENV__-frontend
     spec:
       containers:
-        - image: gcr.io/planguru/planguru-frontend:__REVISION_ID__
+        - image: gcr.io/scopeberry/scopeberry-frontend:__REVISION_ID__
           imagePullPolicy: Always
-          name: planguru-cloud-sha256
+          name: scopeberry-cloud-sha256
           resources:
             requests:
               cpu: 100m

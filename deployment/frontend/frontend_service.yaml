@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: planguru-__PLANGURU_ENV__-frontend
+  name: scopeberry-__SCOPEBERRY_ENV__-frontend
   labels:
-    app: planguru-__PLANGURU_ENV__-frontend
-  name: planguru-__PLANGURU_ENV__-frontend
+    app: scopeberry-__SCOPEBERRY_ENV__-frontend
+  name: scopeberry-__SCOPEBERRY_ENV__-frontend
   namespace: default
 spec:
   ports:
@@ -17,6 +17,6 @@ spec:
       protocol: TCP
       targetPort: 443
   selector:
-    app: planguru-__PLANGURU_ENV__-frontend
+    app: scopeberry-__SCOPEBERRY_ENV__-frontend
   sessionAffinity: None
   type: LoadBalancer

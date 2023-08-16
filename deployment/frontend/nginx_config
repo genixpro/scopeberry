@@ -58,7 +58,7 @@ server {
     rewrite ^/app/(.*)(/)? / last;
 
     location /api/ {
-        proxy_pass http://planguru-__PLANGURU_ENV__-api.default:80/;
+        proxy_pass http://scopeberry-__SCOPEBERRY_ENV__-api.default:80/;
     }
 
 	location / {

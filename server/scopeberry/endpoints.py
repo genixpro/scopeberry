@@ -1,6 +1,6 @@
 from flask import jsonify, request
-from planguru.app import app
-from planguru.openai_local import completion
+from scopeberry.app import app
+from scopeberry.openai_local import completion
 
 @app.route('/home', methods=['GET'])
 def home_endpoint():

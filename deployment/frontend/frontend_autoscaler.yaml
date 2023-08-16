@@ -2,13 +2,13 @@ apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   labels:
-    app: planguru-__PLANGURU_ENV__-frontend
-  name: planguru-__PLANGURU_ENV__-frontend-hpa
+    app: scopeberry-__SCOPEBERRY_ENV__-frontend
+  name: scopeberry-__SCOPEBERRY_ENV__-frontend-hpa
 spec:
   maxReplicas: __MAXIMUM_REPLICATIONS__
   minReplicas: __MINIMUM_REPLICATIONS__
   scaleTargetRef:
     apiVersion: apps/v1beta1
     kind: Deployment
-    name: planguru-__PLANGURU_ENV__-frontend
+    name: scopeberry-__SCOPEBERRY_ENV__-frontend
   targetCPUUtilizationPercentage: 80

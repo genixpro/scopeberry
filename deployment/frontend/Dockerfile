@@ -1,7 +1,7 @@
 # This builds an all-in-one easy to install dockerfile
 
 FROM       debian:bookworm
-MAINTAINER PlanGuru <genixpro@gmail.com>
+MAINTAINER ScopeBerry <genixpro@gmail.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -21,43 +21,43 @@ RUN apt-get update && apt-get install \
 #        rm -rf /usr/share/man/*
 
 # Set the working directory to /app
-WORKDIR /planguru
+WORKDIR /scopeberry
 
 # We add package.json first so that the  docker image build
 # can use the cache as long as contents of package.json
 # hasn't changed.
-RUN mkdir /planguru/client
-COPY client/package.json /planguru/client
-WORKDIR /planguru/client
+RUN mkdir /scopeberry/client
+COPY client/package.json /scopeberry/client
+WORKDIR /scopeberry/client
 RUN npm install && \
         rm -rf /root/.npm/_cacache && \
         rm -rf /var/cache/*
 
-ARG PLANGURU_ENV
+ARG SCOPEBERRY_ENV
 
 # Copy the NGINX configuration
 ADD deployment/frontend/nginx_config /etc/nginx/sites-enabled/default
-RUN sed "s/__PLANGURU_ENV__/${PLANGURU_ENV}/g" -i /etc/nginx/sites-enabled/default
-#ADD deployment/ssl/planguru.key /etc/nginx/ssl/nginx.key
+RUN sed "s/__SCOPEBERRY_ENV__/${SCOPEBERRY_ENV}/g" -i /etc/nginx/sites-enabled/default
+#ADD deployment/ssl/scopeberry.key /etc/nginx/ssl/nginx.key
 #ADD deployment/ssl/certbundle.pem /etc/nginx/ssl/nginx.pem
 
-# Copy the current directory contents into the container at /planguru
-ADD client /planguru/client
+# Copy the current directory contents into the container at /scopeberry
+ADD client /scopeberry/client
 
-# Set the working directory to /planguru/client, and build the frontend package
-WORKDIR /planguru/client
-ENV PLANGURU_ENV=${PLANGURU_ENV}
+# Set the working directory to /scopeberry/client, and build the frontend package
+WORKDIR /scopeberry/client
+ENV SCOPEBERRY_ENV=${SCOPEBERRY_ENV}
 ENV REVISION_ID=${REVISION_ID}
 
-#RUN cp .env.${PLANGURU_ENV} .env.chosen
+#RUN cp .env.${SCOPEBERRY_ENV} .env.chosen
 #RUN rm .env.production
 #RUN mv .env.chosen .env.production
 
-# Build the frontend static files and delete all the planguru code, nodejs and python to trim down the image size
+# Build the frontend static files and delete all the scopeberry code, nodejs and python to trim down the image size
 RUN npm run-script build && \
         mkdir /build && \
         mv build/* /build && \
-        rm -rf /planguru && \
+        rm -rf /scopeberry && \
         apt-get purge nodejs -y && \
         rm -rf /root/.npm && \
         rm -rf /var/lib/dpkg/* && \
