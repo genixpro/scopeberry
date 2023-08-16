@@ -40,6 +40,5 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      priorityClassName: __PLANGURU_ENV__-priority
       terminationGracePeriodSeconds: 15
 
