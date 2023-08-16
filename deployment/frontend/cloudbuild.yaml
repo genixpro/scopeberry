@@ -1,0 +1,35 @@
+steps:
+  - name: 'gcr.io/kaniko-project/executor:latest'
+    id: Build Frontend Docker Image
+    args:
+      - "--destination=gcr.io/planguru/planguru-frontend-$_PLANGURU_ENV:$REVISION_ID"
+      - "--destination=gcr.io/planguru/planguru-frontend-$_PLANGURU_ENV:latest"
+      - "--cache=true"
+      - "--cache-ttl=720h"
+      - "--snapshotMode=time"
+      - "--build-arg"
+      - "PLANGURU_ENV=$_PLANGURU_ENV"
+      - "--build-arg"
+      - "REVISION_ID=$REVISION_ID"
+      - "-f"
+      - "deployment/frontend/Dockerfile"
+    timeout: 600s
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - 'cluster-info'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=planguru-main'
+    timeout: 30s
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: Update Frontend Server Deployment
+    entrypoint: /bin/bash
+    args:
+      - "./deployment/frontend/update_frontend_server.sh"
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=planguru-main'
+      - 'PLANGURU_ENV=$_PLANGURU_ENV'
+      - 'REVISION_ID=$REVISION_ID'
+    timeout: 600s
+timeout: 3600s
