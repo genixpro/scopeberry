@@ -57,9 +57,9 @@ server {
 	server_name _;
     rewrite ^/app/(.*)(/)? / last;
 
-    #location /api/ {
-    #    proxy_pass http://planguru-__PLANGURU_ENV__-api.default:80/api/;
-    #}
+    location /api/ {
+        proxy_pass http://planguru-__PLANGURU_ENV__-api.default:80/;
+    }
 
 	location / {
 		# First attempt to serve request as file, then

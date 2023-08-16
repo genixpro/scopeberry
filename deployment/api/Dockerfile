@@ -94,6 +94,6 @@ WORKDIR /planguru/server
 USER planguru:planguru
 
 # Setup and configure systemd
-ENTRYPOINT ["bash", "-c", "gunicorn -t 600 -w 16 -b 0.0.0.0:3000 planguru.app"]
+ENTRYPOINT ["bash", "-c", "gunicorn -t 600 -w 1 -b 0.0.0.0:3000 planguru.app:app"]
 
 EXPOSE 3000
