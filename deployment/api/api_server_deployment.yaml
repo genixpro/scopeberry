@@ -23,6 +23,11 @@ spec:
         - env:
             - name: PLANGURU_ENV
               value: __PLANGURU_ENV__
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: openai-key
+                  key: OPENAI_API_KEY
           image: gcr.io/planguru-cloud/planguru-api-__PLANGURU_ENV__:__REVISION_ID__
           imagePullPolicy: Always
           name: planguru-cloud-sha256
@@ -47,14 +52,9 @@ spec:
             successThreshold: 1
             timeoutSeconds: 15
           resources:
-            limits:
-              cpu: "3"
             requests:
-              cpu: 500m
-              memory: 1Gi
-          volumeMounts:
-            - mountPath: /dev/shm
-              name: dshm
+              cpu: 1000m
+              memory: 256Mi
           securityContext:
             privileged: true
             capabilities:
@@ -63,9 +63,4 @@ spec:
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
-      priorityClassName: __PLANGURU_ENV__-priority
       terminationGracePeriodSeconds: 15
-      volumes:
-        - name: dshm
-          emptyDir:
-            medium: Memory
