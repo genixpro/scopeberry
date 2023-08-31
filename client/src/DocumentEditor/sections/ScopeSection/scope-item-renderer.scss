@@ -46,7 +46,32 @@ $scope-item-border-color: #bbb;
         position: relative;
         top: 2px;
       }
+
+      &:not(:last-child) {
+        margin-right: 5px !important;
+      }
     }
+  }
+
+  .service-item-editor {
+    border-left: 1px solid $scope-item-border-color;
+    align-self: stretch;
+    padding-left: 10px;
+    padding-right: 10px;
+
+    display: flex;
+    flex-direction: column;
+  }
+
+  .service-item-title {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .service-item-questions {
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
   }
 
   .scope-item-rowWrapper {

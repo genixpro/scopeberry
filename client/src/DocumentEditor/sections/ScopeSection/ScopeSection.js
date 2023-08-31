@@ -4,6 +4,7 @@ import {SortableTreeWithoutDndContext as SortableTree} from '@nosferatu500/react
 import '@nosferatu500/react-sortable-tree/style.css';
 import createScopeItemRenderer from "./scope-item-renderer";
 import {getCompletion} from "../../../components/api";
+import {NewServiceItemModal} from "./NewServiceItemModal";
 
 
 export class ScopeSection extends Component {
@@ -17,6 +18,7 @@ export class ScopeSection extends Component {
         this.nodeContentRenderer = createScopeItemRenderer({
             onTitleChanged: this.handleItemTextChanged.bind(this),
             onNewItemClicked: this.onNewItemClicked.bind(this),
+            onNewStandardServiceItemClicked: this.onNewStandardServiceItemClicked.bind(this),
             onDeleteItemClicked: this.onDeleteItemClicked.bind(this),
             onFillSubtasksClicked: this.onFillSubtasksClicked.bind(this),
             onTitleEditBlur: this.onTitleEditBlur.bind(this),
@@ -26,10 +28,14 @@ export class ScopeSection extends Component {
 
         this.newItemIndex = 0;
         this.isLoadingPredictions = false;
+        this.newServiceParentItemNode = null;
 
         const defaultItems = this.generateDefaultItems();
         this.updateTreeNodes(defaultItems);
-        this.state = {items: defaultItems};
+        this.state = {
+            items: defaultItems,
+            isShowingNewServiceItemModal: false,
+        };
     }
 
     componentDidMount() {
@@ -71,6 +77,16 @@ export class ScopeSection extends Component {
             "title": taskTitle,
             expanded: true,
             type: "predicted-scope-item",
+            children: [],
+        }
+    }
+
+    createTreeNodeForServiceItem(serviceItemInfo) {
+        return {
+            "id": `item-${this.newItemIndex++}`,
+            "title": serviceItemInfo.label,
+            expanded: true,
+            type: "service-item",
             children: [],
         }
     }
@@ -162,7 +178,7 @@ export class ScopeSection extends Component {
                 items[index].isLastScopeItemInGroup = false;
             } else {
                 const nextItem = items[index + 1];
-                if (nextItem.type === "scope-item") {
+                if (nextItem.type !== "new") {
                     items[index].isLastScopeItemInGroup = false;
                 } else {
                     items[index].isLastScopeItemInGroup = true;
@@ -207,20 +223,38 @@ export class ScopeSection extends Component {
         }
     }
 
-
-    onNewItemClicked(newItemNode) {
-        const items = this.state.items;
-
-        const parent = this.findParentOfItemByTreeIndex(newItemNode.treeIndex);
-        const newItem = this.createTreeNodeForScopeItem("New Task...");
-
-        if (parent) {
-            parent.children.splice(parent.children.length - 1, 0, newItem);
-        } else {
-            items.splice(items.length - 1, 0, newItem);
+    findItemByTreeIndex(treeIndex, items) {
+        if (!items) {
+            items = this.state.items;
         }
 
-        this.handleTreeChanged(items);
+        // Finds the item within the tree matching the given tree index
+        for (let index = 0; index < items.length; index++) {
+            if (items[index].treeIndex === treeIndex) {
+                return items[index];
+            }
+
+            const foundItem = this.findItemByTreeIndex(treeIndex, items[index].children);
+            if (foundItem) {
+                return foundItem;
+            }
+        }
+        return null;
+    }
+
+
+    onNewItemClicked(newItemNode) {
+        const parent = this.findParentOfItemByTreeIndex(newItemNode.treeIndex);
+        const newItem = this.createTreeNodeForScopeItem("New Task...");
+        this.addChildItem(parent, newItem);
+    }
+
+
+    onNewStandardServiceItemClicked(parentItemNode) {
+        this.setState({
+            isShowingNewServiceItemModal: true
+        });
+        this.newServiceParentItemNode = parentItemNode;
     }
 
     onDeleteItemClicked(nodeToDelete) {
@@ -272,6 +306,24 @@ export class ScopeSection extends Component {
     onRejectPredictedScopeItemClicked(nodeToReject) {
         const items = this.state.items;
         this.removeNodeItemFromTree(nodeToReject);
+        this.handleTreeChanged(items);
+    }
+
+    onAddServiceItem(serviceItemInfo) {
+        const parent = this.findParentOfItemByTreeIndex(this.newServiceParentItemNode.treeIndex);
+        const newItem = this.createTreeNodeForServiceItem(serviceItemInfo);
+        this.addChildItem(parent, newItem);
+        this.setState({isShowingNewServiceItemModal: false});
+    }
+
+    addChildItem(parent, newItem) {
+        const items = this.state.items;
+        if (parent) {
+            parent.children.splice(parent.children.length - 1, 0, newItem);
+        } else {
+            items.splice(items.length - 1, 0, newItem);
+        }
+
         this.handleTreeChanged(items);
     }
 
@@ -418,6 +470,19 @@ export class ScopeSection extends Component {
         }
     }
 
+    computeRowHeightForTreeNode(treeIndex) {
+        const treeNode = this.findItemByTreeIndex(treeIndex);
+        if (!treeNode) {
+            return 0;
+        }
+
+        if (treeNode.type === "service-item") {
+            return 120;
+        } else {
+            return 30;
+        }
+    }
+
     render() {
         return <div className={"scope-section"}>
 
@@ -429,9 +494,15 @@ export class ScopeSection extends Component {
                 getNodeKey={({node}) => node.id}
                 nodeContentRenderer={this.nodeContentRenderer}
                 canNodeHaveChildren={(node) => node.type === "scope-item"}
-                rowHeight={30}
+                rowHeight={(treeIndex) => this.computeRowHeightForTreeNode(treeIndex)}
                 canDrop={(info) => this.checkIfScopeItemCanDropAtLocation(info)}
                 isVirtualized={true}
+            />
+
+            <NewServiceItemModal
+                open={this.state.isShowingNewServiceItemModal}
+                handleClose={() => this.setState({isShowingNewServiceItemModal: false})}
+                handleAddServiceItem={(serviceItem) => {this.onAddServiceItem(serviceItem)}}
             />
         </div>;
     }

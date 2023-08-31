@@ -80,10 +80,8 @@ const defaultProps = {
  */
 function renderNewScopeItemRow(props, eventHandlers) {
     const {
-        onTitleChanged,
         onNewItemClicked,
-        onDeleteItemClicked,
-        onFillSubtasksClicked
+        onNewStandardServiceItemClicked,
     } = eventHandlers;
 
     const {
@@ -125,7 +123,16 @@ function renderNewScopeItemRow(props, eventHandlers) {
                         onClick={(evt) => onNewItemClicked(node)}
                         className={"scope-item-add-button"}
                 >
-                    <span className={"add-scope-item-button-text"}>Add</span>
+                    <span className={"add-scope-item-button-text"}>Add Item</span>
+                </Button>
+                <Button color="success"
+                        variant="contained"
+                        startIcon={<AddIcon/>}
+                        aria-label="add"
+                        onClick={(evt) => onNewStandardServiceItemClicked(node)}
+                        className={"scope-item-add-button"}
+                >
+                    <span className={"add-scope-item-button-text"}>Add Service</span>
                 </Button>
             </div>
         </div>
@@ -217,17 +224,12 @@ function computeTreeNodeClassNames(node) {
         (node.type === "predicted-scope-item" ? 'predicted-scope-item ' : ' ');
 }
 
-/**
- * This renders scope item rows in the renderer
- */
-function renderScopeItemRow(props, eventHandlers) {
-    const {
-        onTitleChanged,
-        onNewItemClicked,
-        onDeleteItemClicked,
-        onFillSubtasksClicked
-    } = eventHandlers;
 
+
+/**
+ * This renders editor rows which include a drag handle to move items around
+ */
+function renderEditorRowWithDragHandle(props, eventHandlers, children) {
     const {
         scaffoldBlockPxWidth,
         toggleChildrenVisibility,
@@ -344,14 +346,28 @@ function renderScopeItemRow(props, eventHandlers) {
                         }}>
                         {handle}
 
-                        {renderRowContentsEditor(rowDirectionClass, node, eventHandlers)}
-
-                        {renderScopeItemToolbar(node, eventHandlers)}
+                        {children}
                     </div>
                 )}
             </div>
         </div>
     )
+}
+/**
+ * This renders scope item rows in the renderer
+ */
+function renderScopeItemRow(props, eventHandlers) {
+    const {
+        rowDirection,
+        node,
+    } = props;
+
+    const rowDirectionClass = rowDirection === 'rtl' ? 'scope-item-rtl' : undefined
+
+    return renderEditorRowWithDragHandle(props, eventHandlers, [
+        renderRowContentsEditor(rowDirectionClass, node, eventHandlers),
+        renderScopeItemToolbar(node, eventHandlers)
+    ]);
 }
 
 function renderPredictedScopeItemRow(props, eventHandlers) {
@@ -462,6 +478,60 @@ function renderLoadingPredictionsRow(props, eventHandlers) {
 }
 
 
+function renderServiceItemRowEditor(rowDirectionClass, node, eventHandlers) {
+    const {
+        onTitleChanged,
+        onTitleEditBlur,
+    } = eventHandlers;
+
+    return <div
+        className={classnames(
+            'scope-item-rowContents',
+            rowDirectionClass ?? '',
+        )}>
+
+        <span className={"scope-number"}>
+            {node.scopeNumber}
+        </span>
+
+        <div className={"service-item-editor"}>
+            <span className={"service-item-title"}>{node.title}</span>
+
+            <div className={"service-item-questions"}>
+                <span>How many physical sites?</span>
+
+                <div>
+                    <input className={"service-item-questions-input"}/>
+                </div>
+                <br/>
+                <span>Total number of network attached devices?</span>
+
+                <div>
+                    <input className={"service-item-questions-input"}/>
+                </div>
+            </div>
+        </div>
+    </div>;
+}
+
+
+/**
+ * This renders service item rows in the renderer
+ */
+function renderServiceItemRow(props, eventHandlers) {
+    const {
+        rowDirection,
+        node,
+    } = props;
+
+    const rowDirectionClass = rowDirection === 'rtl' ? 'scope-item-rtl' : undefined
+
+    return renderEditorRowWithDragHandle(props, eventHandlers, [
+        renderServiceItemRowEditor(rowDirectionClass, node, eventHandlers),
+        renderScopeItemToolbar(node, eventHandlers)
+    ]);
+}
+
 /**
  * This is the function that creates the renderer for the scope items. The renderer is then plugged
  * into react-sortable-tree and thus must be compatible with its code base.
@@ -475,6 +545,8 @@ const CreateNodeRenderer = function (eventHandlers) {
             return renderNewScopeItemRow(props, eventHandlers);
         } else if (node.type === "scope-item") {
             return renderScopeItemRow(props, eventHandlers);
+        } else if (node.type === "service-item") {
+            return renderServiceItemRow(props, eventHandlers);
         } else if (node.type === "predicted-scope-item") {
             return renderPredictedScopeItemRow(props, eventHandlers);
         }  else if (node.type === "loading-predictions") {
